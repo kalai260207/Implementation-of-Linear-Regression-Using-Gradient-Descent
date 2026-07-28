@@ -8,13 +8,10 @@ To write a program to predict the profit of a city using the linear regression m
 2. Anaconda – Python 3.7 Installation / Jupyter notebook
 
 ## Algorithm
-```
-1.Load the dataset from a CSV file and separate the features and target variable, encoding any categorical variables as needed.
-2.Scale the features using a standard scaler to normalize the data.
-3.Initialize model parameters (theta) and add an intercept term to the feature set.
-4.Train the linear regression model using gradient descent by iterating through a specified number of iterations to minimize the cost function.
-5.Make predictions on new data by transforming it using the same scaling and encoding applied to the training data.
-```
+1.Import the required library and read the dataframe.
+2.Write a function compute Cost to generate the cost function.
+3.Perform iterations of gradient steps with learning rate.
+4.Plot the Cost function using Gradient Descent and generate the required graph.
 
 ## Program:
 ```
@@ -22,62 +19,70 @@ To write a program to predict the profit of a city using the linear regression m
 Program to implement the linear regression using gradient descent.
 Developed by: KALAIVANI D
 RegisterNumber:  212224060113
-*/
-```
-```
-import numpy as np
+
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
+import numpy as np
+import matplotlib.pyplot as plt
 
-def linear_regression(X, y, iters=1000, learning_rate=0.01):
-    X = np.hstack((np.ones((X.shape[0], 1)), X))  # Add intercept term
-    theta = np.zeros((X.shape[1], 1))
+data=pd.read_csv("C:/Users/acer/Downloads/50_Startups.csv")
+x=data["R&D Spend"].values
+y=data["Profit"].values
+
+
+x_mean=np.mean(x)
+x_std=np.std(x)
+x=(x-x_mean)/x_std
+
+
+w=0.0
+b=0.0
+alpha=0.01
+epochs=100
+n=len(x)
+
+losses=[]
+
+
+for i in range(epochs):
+    y_hat=w*x+b
+    loss=np.mean((y_hat-y)**2)
+    losses.append(loss)
     
-    for _ in range(iters):
-        predictions = X.dot(theta)
-        errors = predictions - y.reshape(-1, 1)
-        gradient = (1 / X.shape[0]) * X.T.dot(errors)
-        theta -= learning_rate * gradient
+    dw=(2/n)*np.sum((y_hat-y)*x)
+    db=(2/n)*np.sum(y_hat-y)
     
-    return theta
+    w-=alpha*dw
+    b-=alpha*db
 
-data = pd.read_csv('50_Startups.csv', header=0)
 
-X = data.iloc[:, :-1].values
-y = data.iloc[:, -1].values
+plt.figure(figsize=(12,5))
 
-ct = ColumnTransformer(transformers=[
-    ('encoder', OneHotEncoder(), [3])  
-], remainder='passthrough')
+plt.subplot(1,2,1)
+plt.plot(losses)
+plt.xlabel("Iterations")
+plt.ylabel("Loss(MSE)")
+plt.title("Loss vs Iterations")
 
-X = ct.fit_transform(X)
+plt.subplot(1,2,2)
+plt.scatter(x,y)
+x_sorted=np.argsort(x)
+plt.plot(x[x_sorted],(w*x+b)[x_sorted],color="red")
+plt.xlabel("R&D Spend (scaled)")
+plt.ylabel("Profit")
+plt.title("Linear Regression Fit")
 
-y = y.astype(float)
+plt.tight_layout()
+plt.show()
 
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+print(f"Final weight (w): {w}")
+print(f"Final bias (b): {b}")
 
-theta = linear_regression(X_scaled, y, iters=1000, learning_rate=0.01)
-
-new_data = np.array([165349.2, 136897.8, 471784.1, 'New York']).reshape(1, -1)  # Example new data
-new_data_scaled = scaler.transform(ct.transform(new_data))
-
-new_prediction = np.dot(np.append(1, new_data_scaled), theta)
-
-print(f"Predicted value: {new_prediction[0]}")
-data.head()
-
+*/
 ```
 
 ## Output:
-```
-Predicted value: 193075.97426510364
-```
-![Screenshot](https://github.com/user-attachments/assets/ae06e431-21f7-47fe-967b-eaa88d5bf53f)
 
-
+<img width="1278" height="588" alt="image" src="https://github.com/user-attachments/assets/56cda89b-130b-42ff-8d17-3f233c8eb0cb" />
 
 
 
